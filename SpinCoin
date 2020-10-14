@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Threading;
+using UnityEngine;
+using UnityEngine.UI;
+
+
+public class SpinCoin : MonoBehaviour
+{
+    public int speed = 1;
+    public GameObject floatingPoint;
+    // Update is called once per frame
+    
+
+    void Start(){
+        
+    }
+    void Update()
+    {
+        if(Time.timeScale == 0f){
+            return;
+        }
+        transform.Rotate(0, speed, 0, Space.World);
+    }
+    private void OnTriggerEnter(Collider something){
+        if(something.tag == "Player"){
+            if (gameObject.name == "Coin")
+            {
+                PlayerMotor.popUptextOnPlayer("+1", floatingPoint, transform.position, Color.yellow);
+                something.GetComponent<Score>().getIncrementCoins();
+                Destroy(gameObject);
+            }
+            else if (gameObject.name == "Health")
+            {
+                PlayerMotor.popUptextOnPlayer("+1", floatingPoint, transform.position, Color.green);
+                something.GetComponent<Score>().getIncrementHealth();
+                Destroy(gameObject);
+            }
+        }
+    }
+}
