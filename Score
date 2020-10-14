@@ -1,0 +1,110 @@
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+public class Score : MonoBehaviour
+{
+
+    public int health = 3;
+
+    private float score = 0.0f;   //We need it float so we can use it with Time.deltaTime
+    private int coins = 0;
+    public Text scoreText;
+    public Text coinsText;
+
+    //Here we can increase difficulty of the game every 10 rounds
+    private int currentDifficulty = 1;
+    private int maxDifficulty = 20;
+    private int nextIncrease = 10;
+
+
+    public Text TextCapacityBullet;
+
+
+
+    public GameObject floatingPoint;
+
+    //Timer 
+    public Text time;
+    int seconds;
+    int minutes = 0;
+    float startTime;
+
+    public DeathMenu deathMenu;
+    private bool isDead = false;
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (isDead) {
+            return;
+        }
+
+        if (score >= nextIncrease)
+        {
+            PlayerMotor.popUptextOnPlayer("Level " + currentDifficulty,floatingPoint, transform.position,Color.white);
+            levelUp();
+        }
+
+        //UPDATE: score start on every mili second
+        score += Time.deltaTime * currentDifficulty;
+        scoreText.text = ((int)score).ToString();
+
+
+        //Timer moved to score, just to keep everything in one place.
+        timerUpdate();
+    }
+
+    public void levelUp() {
+        if (currentDifficulty == maxDifficulty) {
+            return; //reached the max difficulty (fastest gameplay)
+        }
+        nextIncrease *= 2;
+        currentDifficulty++;
+
+
+        //thats why we need to make everyscript under the player, so we can access other scripts from one place.
+        GetComponent<PlayerMotor>().setSpeed(currentDifficulty);
+    }
+
+    public void onDeath() {
+        isDead = true;
+        deathMenu.toggleEndMenu(score, time.text, coins.ToString());
+    }
+
+    public int getIncrementCoins(){
+        coins = coins+1;
+        coinsText.text = coins.ToString();
+        return coins;
+    }
+
+    public int getIncrementHealth() {
+        if (health <= 3)
+        {
+            health++;
+           
+            GetComponent<PlayerMotor>().healthBar.SetHealth(health);
+        }
+        return health;
+    }
+
+    public void timerUpdate() {
+        float t = Time.time - startTime; //Time since start
+        seconds = ((int)t);
+        if (seconds >= 60)
+        {
+            startTime = Time.time;
+            minutes++;
+
+        }
+        if (minutes == 0)
+        {
+            time.text = seconds.ToString();
+        }
+        else
+        {
+            time.text = minutes + ":" + seconds;
+        }
+    }
+}
